@@ -11,6 +11,9 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    // Бібліотеки для 2-ї лабораторної
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+    implementation("co.touchlab:kermit:2.0.2")
 }
 
 kotlin {
