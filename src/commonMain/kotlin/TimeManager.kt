@@ -2,15 +2,19 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+// Очікувана функція для різних платформ
+expect fun getSystemTimeZoneId(): String
+
 interface TimeManager {
     fun getCurrentDateTime(): String
     fun getCurrentTimeZone(): String
-    fun getAllTimeZones(): List<String> // Новий метод
+    fun getAllTimeZones(): List<String>
 }
 
 class TimeManagerImpl : TimeManager {
     override fun getCurrentTimeZone(): String {
-        return TimeZone.currentSystemDefault().id
+        // Викликаємо нашу expect функцію
+        return getSystemTimeZoneId()
     }
 
     override fun getCurrentDateTime(): String {
@@ -20,7 +24,6 @@ class TimeManagerImpl : TimeManager {
     }
 
     override fun getAllTimeZones(): List<String> {
-        // Повертаємо список усіх доступних часових зон
         return TimeZone.availableZoneIds.toList()
     }
 }
