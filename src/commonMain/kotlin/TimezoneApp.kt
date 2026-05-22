@@ -7,11 +7,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
 
 @Composable
 fun TimezoneAppScreen(timeManager: TimeManager) {
     var selectedTab by remember { mutableStateOf(0) }
-    // Стан для збереження вибраних зон
     val selectedZones = remember { mutableStateListOf<String>() }
 
     Scaffold(
@@ -19,16 +20,16 @@ fun TimezoneAppScreen(timeManager: TimeManager) {
             TabRow(selectedTabIndex = selectedTab) {
                 Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("Часові зони") })
                 Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("Зустріч") })
+                // Додаємо третю вкладку
+                Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("Замовлення") })
             }
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
-            if (selectedTab == 0) {
-                // Сторінка з часовими зонами [cite: 49]
-                TimeZonesPage(timeManager, selectedZones)
-            } else {
-                // Сторінка пошуку часу зустрічі [cite: 50]
-                MeetingPage(selectedZones)
+            when (selectedTab) {
+                0 -> TimeZonesPage(timeManager, selectedZones)
+                1 -> MeetingPage(selectedZones)
+                2 -> OrderPage()
             }
         }
     }
@@ -120,5 +121,38 @@ fun MeetingPage(selectedZones: List<String>) {
             },
             confirmButton = { TextButton(onClick = { showResultDialog = false }) { Text("ОК") } }
         )
+    }
+}
+
+@Composable
+fun OrderPage() {
+    // Створюємо тестове замовлення
+    val order = remember { RideOrder(id = 101, passengerName = "Артем", destination = "Центральний Вокзал", price = 150.0) }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("ОСТАННЄ ЗАМОВЛЕННЯ CYBER TAXI", style = MaterialTheme.typography.h6)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            elevation = 8.dp,
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Поїздка #${order.id}", style = MaterialTheme.typography.h6, color = MaterialTheme.colors.primaryVariant)
+                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                Text("Пасажир: ${order.passengerName}")
+                Text("Куди: ${order.destination}")
+                Text("Вартість: ₴${order.price}")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Час оформлення:", style = MaterialTheme.typography.caption)
+                // Виводимо час, згенерований мультиплатформною бібліотекою
+                Text("${order.orderTime.date} | ${order.orderTime.time.hour}:${order.orderTime.time.minute}")
+            }
+        }
     }
 }
